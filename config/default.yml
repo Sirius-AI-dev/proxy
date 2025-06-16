@@ -1,0 +1,305 @@
+database:
+  queryLog: true
+  defaults:
+    connection: master
+    statement: masterapicall
+    pool: default
+    timeout: 30s
+  connections:
+    master:
+      driver: pq
+      type: postgres
+      dsn: 'DB_DSN from ENV'
+      maxOpenConn: 256
+
+  statements:
+    masterapicall:
+      connection: master
+      statement: "SELECT ub.api_call($1::jsonb)::jsonb"
+  pools:
+    default:
+      failattempts: 5
+      failattemptsperiod: 30s
+      lockperiod: 1m
+      statements:
+        - masterapicall
+
+    logs:
+      statements:
+        - masterapicall
+
+  apiCallMap: ~
+
+services:
+  blacklist:
+    enabled: false
+
+logger:
+  level: '"debug"'
+  handler: text
+  collector: logs
+
+storage: ~
+
+server:
+  http:
+    host: 0.0.0.0
+    port: 80
+  grpc:
+    host: 0.0.0.0
+    port: 5001
+
+  domains: []
+  timeout: 30s
+  geoip:
+    db: ''
+  jwt-secret: 'secret'
+  openapi:
+    host: 'unibackend.org'
+    json: 
+      local: ./storage/openapi.json
+      web: /openapi.json
+  cors:
+    domains: []
+    headers:
+      - origin
+      - content-type
+      - accept
+      - authorization
+      - x-uni-render
+
+  middleware:
+    required:
+      - name: request
+        domains:
+          - api.unibackend.com
+      - name: modify_request
+        modifiers:
+          - modifierName: cookie-to-request
+            member: access_token
+            refresh: refresh_token
+      - name: response
+      - name: request_context
+
+  routes:
+    root:
+      endpoints: ["/"]
+      methods: [get]
+      handler: text
+      data:
+        data: "ok"
+
+    metrics:
+      endpoints: ["/metrics", "/metrics/{metricName}"]
+      internal: true
+      methods: [get]
+      handler: metrics
+
+    pprof:
+      endpoints: [ "/debug/pprof", "/debug/pprof/{ppName}" ]
+      internal: true
+      methods: [get]
+      handler: pprof
+
+    status:
+      endpoints: [ "/status" ]
+      internal: true
+      methods: [ get ]
+      data:
+        mode: status
+      handler: maintenance
+
+    config:
+      endpoints: [ "/config" ]
+      internal: true
+      methods: [ get ]
+      data:
+        mode: config
+      handler: maintenance
+
+worker:
+  processes:
+    parser:
+      type: task_wait
+      mode: worker
+      interval: 1s
+      count: 1
+      buffer: 1
+      connection: master
+      timeout: 5m
+      task:
+        data:
+          mode: worker_get_tasks
+          apicall: /ub/process/parser
+          pipelinerService: http://172.22.100.101:9006/pipeline
+        service: db
+      result:
+        data:
+          mode: worker_set_tasks
+          apicall: /ub/process/parser
+        service: db
+
+    pkg_comm:
+      disabled: true
+    cron:
+      disabled: true
+    collector_1:
+      disabled: true
+    collector_2:
+      disabled: true
+    collector_3:
+      disabled: true
+    collector_4:
+      disabled: true
+
+#    config:
+#      type: notify
+#      channel: config
+#      notificator: standard
+#      connection: master
+#
+#    blacklist:
+#      type: notify
+#      channel: blacklist
+#      notificator: blacklist
+#      connection: master
+#      mode: proxy
+#
+#    wsnotify:
+#      type: notify
+#      channel: ws
+#      notificator: websocket
+#      connection: master
+#      mode: proxy
+
+#    task:
+#      type: task_interval
+#      interval: 1s
+#      connection: master
+#      mode: worker
+#      buffer: 0
+#      count: 1
+#      task:
+#        service: db
+#        data:
+#          apicall: /ub/process/task
+
+collectors:
+  logs:
+    batchSize: 100
+    bufferSize: 10000
+    timeout: 5s
+    pool: logs
+    key: items
+    apicall: /log/add
+
+  analytics:
+    batchSize: 1000
+    bufferSize: 10000
+    timeout: 5s
+    pool: logs
+    key: items
+    apicall: /event/add
+
+metrics:
+  runtime:
+    duration: 5s
+    cpu: true
+    mem: true
+    gc: true
+  list:
+    proxy_request_duration:
+      type: summaryVec
+      labels: ["host", "route"]
+
+    proxy_handler_duration:
+      type: summaryVec
+      labels: ["host", "route", "handler", "status"]
+
+    proxy_database_duration:
+      type: summaryVec
+      labels: ["host", "route", "statementId"]
+
+    proxy_apicall_duration:
+      type: summaryVec
+      labels: ["host", "route", "apicall", "statementId"]
+
+    proxy_blacklist_count:
+      type: gauge
+
+    proxy_uploaded_files_count:
+      type: counter
+
+    tasks_executed_count:
+      type: counterVec
+      labels: [proxy_id, service]
+
+    es_connection_count:
+      type: gaugeVec
+      labels: [proxy_id]
+
+    es_message_send_count:
+      type: counterVec
+      labels: [ proxy_id ]
+
+    # Runtime metrics
+    runtime_cpu_num:
+      type: gauge
+    runtime_cpu_goroutine:
+      type: gauge
+    runtime_cpu_cgo_call:
+      type: gauge
+    runtime_mem_alloc:
+      type: gauge
+    runtime_mem_alloc_total:
+      type: counter
+    runtime_mem_sys:
+      type: gauge
+    runtime_mem_othersys:
+      type: gauge
+    runtime_mem_lookups:
+      type: gauge
+    runtime_mem_malloc:
+      type: gauge
+    runtime_mem_frees:
+      type: gauge
+    runtime_mem_heap_alloc:
+      type: gauge
+    runtime_mem_heap_sys:
+      type: gauge
+    runtime_mem_heap_idle:
+      type: gauge
+    runtime_mem_heap_inuse:
+      type: gauge
+    runtime_mem_heap_released:
+      type: gauge
+    runtime_mem_heap_objects:
+      type: gauge
+    runtime_mem_stack_inuse:
+      type: gauge
+    runtime_mem_stack_sys:
+      type: gauge
+    runtime_mem_mspan_inuse:
+      type: gauge
+    runtime_mem_mspan_sys:
+      type: gauge
+    runtime_mem_mcache_inuse:
+      type: gauge
+    runtime_mem_mcache_sys:
+      type: gauge
+    runtime_mem_gc_sys:
+      type: gauge
+    runtime_mem_gc_next:
+      type: gauge
+    runtime_mem_gc_num:
+      type: gauge
+    runtime_mem_gc_last:
+      type: gauge
+    runtime_mem_gc_pause_total:
+      type: gauge
+    runtime_mem_gc_pause:
+      type: gauge
+    runtime_mem_gc_count:
+      type: gauge
+    runtime_mem_gc_cpu_fraction:
+      type: gauge
