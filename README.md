@@ -2,7 +2,7 @@
 
 The Proxy Service is a GoLang application designed for managing incoming HTTP requests.
 
-It uses a **Proxy Config** to define API requests and specifies where and under what conditions to direct them.
+It uses a [Proxy Config](https://github.com/Sirius-AI-dev/proxy/tree/main/config) to define API requests and specifies where and under what conditions to direct them.
 
 The Proxy Service then performs the following steps:
 1.  Receives the request.
@@ -10,7 +10,7 @@ The Proxy Service then performs the following steps:
 3.  Adds `request_context` (with IP, user-agent, etc.) and other configurable parameters to the request body.
 4.  Applies request balancing rules to distribute requests evenly among multiple servers.
 5.  Calls the necessary service, such as a NodeJS application or a PostgreSQL function.
-6.  Processes the response. If the response contains Proxy Tasks (in the `proxy:[]` section), it executes these tasks, either synchronously (waiting for a response) or in the background.
+6.  Processes the response. If the response contains [Proxy Tasks](https://github.com/Sirius-AI-dev/proxy/wiki#proxy-tasks) (in the `proxy:[]` section), it executes these tasks, either synchronously (waiting for a response) or in the background.
 
 ## Key Features
 
