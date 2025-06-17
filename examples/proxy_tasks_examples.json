@@ -1,0 +1,119 @@
+Proxy Tasks examples:
+
+// Send two requests to ChatGPT, collect responses and send them to internal endpoint /gpt/process
+[
+  {
+    "data": {
+      "url": "https://api.openai.com/v1/chat/completions",
+      "body": {
+        "model": "gpt-4.1-mini",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Your prompt 1"
+          }
+        ]
+      },
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your_token>"
+      },
+      "timeout": "300s"
+    },
+    "options": {
+      "taskGroup": "chatgpt",
+      "responseTo": "response_1"
+    },
+    "service": "http"
+  },
+  {
+    "data": {
+      "url": "https://api.openai.com/v1/chat/completions",
+      "body": {
+        "model": "gpt-4.1-mini",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Your prompt 2"
+          }
+        ]
+      },
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <your_token>"
+      },
+      "timeout": "300s"
+    },
+    "options": {
+      "taskGroup": "chatgpt",
+      "responseTo": "response_2"
+    },
+    "service": "http"
+  },
+  {
+    "data": {
+      "url": "/gpt/process",
+      "body": {
+        "model": "chatgpt"
+      },
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "timeout": "16s"
+    },
+    "options": {
+      "collectedTo": "chatgpt_responses",
+      "taskGroup": "self"
+    },
+    "service": "http"
+  }
+]
+
+
+
+// Send a message to Telegram
+[
+  {
+    "data": {
+      "url": "https://api.telegram.org/bottoken/sendMessage",
+      "body": {
+        "text": "My message",
+        "chat_id": 1234
+      },
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "timeout": "16s"
+    },
+    "options": {
+      "taskGroup": "nowait"
+    },
+    "service": "http"
+  }
+]
+
+
+// Call PostgreSQL entrypoint function, with parameters
+[
+  {
+    "data": {
+      "api_call": "/user/data",
+      "params": {
+        "id": 1234
+      },
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "timeout": "16s"
+    },
+    "options": {
+      "taskGroup": "self"
+    },
+    "service": "db"
+  }
+]
