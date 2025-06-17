@@ -1,0 +1,611 @@
+{
+  "server": {
+    "cors": {
+      "domains": [
+        "https://localhost:3000",
+        "https://unirender.org"
+      ],
+      "headers": [
+        "X-Uni-Render",
+        "origin",
+        "content-type",
+        "accept",
+        "authorization",
+        "cache-control",
+        "access-control-allow-origin",
+        "access-control-allow-headers"
+      ]
+    },
+    "routes": {
+      "root": {
+        "tasks": [
+          {
+            "service": "db"
+          }
+        ],
+        "handler": "db",
+        "methods": [
+          "get",
+          "post"
+        ],
+        "timeout": "60s",
+        "internal": true,
+        "endpoints": [
+          "/"
+        ],
+        "middlewares": [
+          {
+            "name": "request_context"
+          },
+          {
+            "name": "parse_body"
+          }
+        ]
+      },
+      "pprof": {
+        "tasks": [
+          {
+            "service": "db"
+          }
+        ],
+        "handler": "db",
+        "methods": [
+          "get",
+          "post"
+        ],
+        "timeout": "60s",
+        "internal": true,
+        "endpoints": [
+          "/debug/pprof",
+          "/debug/pprof/:ppName"
+        ],
+        "middlewares": [
+          {
+            "name": "request_context"
+          },
+          {
+            "name": "parse_body"
+          }
+        ]
+      },
+      "redoc": {
+        "tasks": [
+          {
+            "service": "db"
+          }
+        ],
+        "handler": "db",
+        "methods": [
+          "get",
+          "post"
+        ],
+        "timeout": "60s",
+        "internal": true,
+        "endpoints": [
+          "/redoc/",
+          "/redoc/:file"
+        ],
+        "middlewares": [
+          {
+            "name": "request_context"
+          },
+          {
+            "name": "parse_body"
+          }
+        ]
+      },
+      "apiCall": {
+        "tasks": [
+          {
+            "service": "db"
+          }
+        ],
+        "handler": "db",
+        "methods": [
+          "get",
+          "post"
+        ],
+        "timeout": "60s",
+        "internal": true,
+        "endpoints": [
+          "/apicall"
+        ],
+        "middlewares": [
+          {
+            "name": "log"
+          },
+          {
+            "name": "parse_body"
+          }
+        ]
+      },
+      "metrics": {
+        "tasks": [
+          {
+            "service": "db"
+          }
+        ],
+        "handler": "db",
+        "methods": [
+          "get",
+          "post"
+        ],
+        "timeout": "60s",
+        "internal": true,
+        "endpoints": [
+          "/metrics",
+          "/metrics/:metricName"
+        ],
+        "middlewares": [
+          {
+            "name": "request_context"
+          },
+          {
+            "name": "parse_body"
+          }
+        ]
+      },
+      "swagger": {
+        "tasks": [
+          {
+            "service": "db"
+          }
+        ],
+        "handler": "db",
+        "methods": [
+          "get",
+          "post"
+        ],
+        "timeout": "60s",
+        "internal": true,
+        "endpoints": [
+          "/swagger-ui/",
+          "/swagger-ui/:file"
+        ],
+        "middlewares": [
+          {
+            "name": "request_context"
+          },
+          {
+            "name": "parse_body"
+          }
+        ]
+      },
+      "/ub/render": {
+        "tasks": [
+          {
+            "data": {
+              "apicall": "/ub/render"
+            },
+            "service": "db"
+          }
+        ],
+        "handler": "db",
+        "methods": [
+          "get",
+          "post"
+        ],
+        "timeout": "60s",
+        "internal": false,
+        "endpoints": [
+          "/ub/render"
+        ],
+        "middlewares": [
+          {
+            "name": "parse_body"
+          },
+          {
+            "name": "modify_request",
+            "modifiers": [
+              {
+                "modifierName": "header-to-request",
+                "authorization": "authorizationToken"
+              }
+            ]
+          }
+        ]
+      },
+      "/ub/status": {
+        "tasks": [
+          {
+            "service": "db"
+          }
+        ],
+        "handler": "db",
+        "methods": [
+          "get",
+          "post"
+        ],
+        "timeout": "60s",
+        "internal": true,
+        "endpoints": [
+          "/ub/status"
+        ],
+        "middlewares": [
+          {
+            "name": "parse_body"
+          }
+        ]
+      },
+      "openapifile": {
+        "tasks": [
+          {
+            "service": "db"
+          }
+        ],
+        "handler": "db",
+        "methods": [
+          "get",
+          "post"
+        ],
+        "timeout": "60s",
+        "internal": true,
+        "endpoints": [
+          "/openapi.json"
+        ],
+        "middlewares": [
+          {
+            "name": "request_context"
+          },
+          {
+            "name": "parse_body"
+          }
+        ]
+      },
+      "/ub/es/check": {
+        "tasks": [
+          {
+            "data": {
+              "apicall": "/ub/es/check"
+            },
+            "service": "db"
+          }
+        ],
+        "handler": "db",
+        "methods": [
+          "get",
+          "post"
+        ],
+        "timeout": "60s",
+        "internal": true,
+        "endpoints": [
+          "/ub/es/check"
+        ],
+        "middlewares": [
+          {
+            "name": "parse_body"
+          }
+        ]
+      },
+      "/ub/es/insert": {
+        "tasks": [
+          {
+            "data": {
+              "apicall": "/ub/es/insert"
+            },
+            "service": "db"
+          }
+        ],
+        "handler": "db",
+        "methods": [
+          "get",
+          "post"
+        ],
+        "timeout": "60s",
+        "internal": true,
+        "endpoints": [
+          "/ub/es/insert"
+        ],
+        "middlewares": [
+          {
+            "name": "parse_body"
+          }
+        ]
+      },
+      "/ub/es/select": {
+        "tasks": [
+          {
+            "data": {
+              "apicall": "/ub/es/select"
+            },
+            "service": "db"
+          }
+        ],
+        "handler": "db",
+        "methods": [
+          "get",
+          "post"
+        ],
+        "timeout": "60s",
+        "internal": true,
+        "endpoints": [
+          "/ub/es/select"
+        ],
+        "middlewares": [
+          {
+            "name": "parse_body"
+          }
+        ]
+      },
+      "/ub/es/register": {
+        "tasks": [
+          {
+            "data": {
+              "apicall": "/ub/es/register"
+            },
+            "service": "db"
+          }
+        ],
+        "handler": "db",
+        "methods": [
+          "get",
+          "post"
+        ],
+        "timeout": "60s",
+        "internal": true,
+        "endpoints": [
+          "/ub/es/register"
+        ],
+        "middlewares": [
+          {
+            "name": "parse_body"
+          },
+          {
+            "name": "modify_request",
+            "modifiers": [
+              {
+                "modifierName": "header-to-request",
+                "authorization": "authorizationToken"
+              }
+            ]
+          }
+        ]
+      },
+      "/ub/es/subscribe": {
+        "tasks": [
+          {
+            "service": "eventstream"
+          }
+        ],
+        "handler": "eventstream",
+        "methods": [
+          "get",
+          "post"
+        ],
+        "timeout": "24h",
+        "internal": false,
+        "endpoints": [
+          "/ub/es/subscribe"
+        ],
+        "middlewares": [
+          {
+            "name": "parse_body"
+          }
+        ]
+      },
+      "/ub/es/unregister": {
+        "tasks": [
+          {
+            "data": {
+              "apicall": "/ub/es/unregister"
+            },
+            "service": "db"
+          }
+        ],
+        "handler": "db",
+        "methods": [
+          "get",
+          "post"
+        ],
+        "timeout": "60s",
+        "internal": true,
+        "endpoints": [
+          "/ub/es/unregister"
+        ],
+        "middlewares": [
+          {
+            "name": "parse_body"
+          },
+          {
+            "name": "modify_request",
+            "modifiers": [
+              {
+                "modifierName": "header-to-request",
+                "authorization": "authorizationToken"
+              }
+            ]
+          }
+        ]
+      },
+      "/ub/upload/file": {
+        "data": {
+          "folder": "/files",
+          "mimext": {
+            "image/*": "jpg",
+            "text/csv": "csv",
+            "image/jpg": "jpg",
+            "image/png": "png",
+            "image/jpeg": "jpg",
+            "text/plain": "txt",
+            "image/jpe?g": "jpg",
+            "application/pdf": "pdf",
+            "application/zip": "zip",
+            "application/gzip": "gz",
+            "application/vnd.ms-excel": "xls",
+            "application/x-7z-compressed": "7z",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "doc"
+          },
+          "source": "file",
+          "fileMode": 777,
+          "destination": "folder",
+          "nameTemplate": "user-file-*.$ext",
+          "requestField": "upload"
+        },
+        "tasks": [
+          {
+            "data": {
+              "apicall": "/ub/upload/data"
+            },
+            "service": "db"
+          }
+        ],
+        "handler": "upload",
+        "methods": [
+          "post"
+        ],
+        "timeout": "60s",
+        "internal": false,
+        "endpoints": [
+          "/ub/upload/file"
+        ],
+        "middlewares": [
+          {
+            "name": "parse_body"
+          },
+          {
+            "name": "modify_request",
+            "modifiers": [
+              {
+                "modifierName": "header-to-request",
+                "authorization": "authorizationToken"
+              }
+            ]
+          }
+        ]
+      },
+      "/ub/process/cron": {
+        "tasks": [
+          {
+            "data": {
+              "apicall": "/ub/process/cron"
+            },
+            "service": "db"
+          }
+        ],
+        "handler": "db",
+        "methods": [
+          "get",
+          "post"
+        ],
+        "timeout": "60s",
+        "internal": true,
+        "endpoints": [
+          "/ub/process/cron"
+        ],
+        "middlewares": [
+          {
+            "name": "parse_body"
+          }
+        ]
+      }
+    },
+    "domains": [
+      "api.unirender.org"
+    ],
+    "timeout": "30s",
+    "apiVersion": "0.0.1",
+    "middleware": {
+      "required": [
+        {
+          "name": "cors"
+        },
+        {
+          "name": "response"
+        },
+        {
+          "name": "recover"
+        },
+        {
+          "name": "tasks"
+        },
+        {
+          "name": "request"
+        },
+        {
+          "name": "request_context"
+        }
+      ]
+    },
+    "excludeRequestKeys": [
+      "userId",
+      "sessionData",
+      "access_token",
+      "refresh_token",
+      "service_token"
+    ]
+  },
+  "worker": {
+    "processes": {
+      "cron": {
+        "mode": "worker",
+        "task": {
+          "data": {
+            "apicall": "/ub/process/cron"
+          },
+          "service": "db"
+        },
+        "type": "task_wait",
+        "count": 1,
+        "label": "CRON process (run tasks in workers)",
+        "active": 1,
+        "buffer": 0,
+        "result": {},
+        "timeout": "60s",
+        "interval": "1s",
+        "connection": "master"
+      },
+      "config": {
+        "type": "notify",
+        "count": 1,
+        "channel": "config",
+        "connection": "master",
+        "notificator": "standard"
+      },
+      "es_check": {
+        "mode": "worker",
+        "task": {
+          "data": {
+            "apicall": "/ub/es/check"
+          },
+          "service": "db"
+        },
+        "type": "task_wait",
+        "count": 1,
+        "label": "Event stream checker",
+        "active": 1,
+        "buffer": 0,
+        "result": {},
+        "timeout": "60s",
+        "interval": "10s",
+        "connection": "master"
+      },
+      "esnotify": {
+        "mode": "proxy",
+        "type": "notify",
+        "count": 1,
+        "channel": "eventstream",
+        "connection": "master",
+        "notificator": "eventstream"
+      }
+    }
+  },
+  "collectors": {
+    "ub_es_insert": {
+      "key": "proxyCollect",
+      "pool": "default",
+      "apicall": "/ub/es/insert",
+      "timeout": "0.2s",
+      "batchSize": 1024,
+      "bufferSize": 1048576
+    },
+    "ub_es_unregister": {
+      "key": "proxyCollect",
+      "pool": "default",
+      "apicall": "/ub/es/unregister",
+      "timeout": "1s",
+      "batchSize": 1024,
+      "bufferSize": 1048576
+    }
+  }
+}
